@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 import requests
 
@@ -43,12 +43,13 @@ def resolve_resume(config: AgentConfig, allow_local: bool = False) -> ResumeStat
 
 
 def download_resume(url: str, target: Path, timeout_seconds: int) -> ResumeStatus:
-    parsed = urlparse(url)
+    download_url = normalize_resume_url(url)
+    parsed = urlparse(download_url)
     if parsed.scheme not in {"http", "https"}:
         return ResumeStatus(status="invalid", source="RESUME_URL", reference="Resume URL must start with http or https.")
 
     try:
-        response = requests.get(url, timeout=timeout_seconds)
+        response = requests.get(download_url, timeout=timeout_seconds)
         response.raise_for_status()
     except requests.RequestException as exc:
         return ResumeStatus(status="unavailable", source="RESUME_URL", reference=str(exc))
@@ -60,6 +61,28 @@ def download_resume(url: str, target: Path, timeout_seconds: int) -> ResumeStatu
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_bytes(content)
     return ResumeStatus(status="available", source="RESUME_URL", reference=url, local_path=target)
+
+
+def normalize_resume_url(url: str) -> str:
+    parsed = urlparse(url)
+    if parsed.netloc not in {"drive.google.com", "www.drive.google.com"}:
+        return url
+
+    file_id = google_drive_file_id(parsed.path, parsed.query)
+    if not file_id:
+        return url
+
+    return f"https://drive.google.com/uc?export=download&id={file_id}"
+
+
+def google_drive_file_id(path: str, query: str) -> str:
+    parts = [part for part in path.split("/") if part]
+    if len(parts) >= 3 and parts[0] == "file" and parts[1] == "d":
+        return parts[2]
+
+    query_values = parse_qs(query)
+    ids = query_values.get("id", [])
+    return ids[0] if ids else ""
 
 
 def validate_local_resume(path: Path) -> ResumeStatus:

@@ -121,4 +121,4 @@ Example `APPLICANT_PROFILE_JSON`:
 }
 ```
 
-For `RESUME_URL`, use a link that GitHub Actions can download without logging in. A private signed URL is better than a public permanent link. The workflow downloads the resume during each run, validates that it is a PDF, and records the resume status in the `Run Metadata` sheet. The actual PDF is not committed to git.
+For `RESUME_URL`, use a link that GitHub Actions can download without logging in. Google Drive share links like `https://drive.google.com/file/d/.../view?...` are automatically converted to direct download links. A private signed URL is better than a public permanent link. The workflow downloads the resume during each run, validates that it is a PDF, and records the resume status in the `Run Metadata` sheet. The actual PDF is not committed to git.
