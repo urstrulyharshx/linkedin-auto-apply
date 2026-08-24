@@ -1,0 +1,52 @@
+name: Daily Job Search Agent
+
+on:
+  schedule:
+    # 09:00 AM IST = 03:30 UTC.
+    - cron: "30 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SEARCH_PROVIDER: ${{ vars.SEARCH_PROVIDER || 'serpapi' }}
+      SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+      GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-4.1-mini' }}
+      APPLICANT_PROFILE_JSON: ${{ secrets.APPLICANT_PROFILE_JSON }}
+      RESUME_URL: ${{ secrets.RESUME_URL }}
+      AUTO_APPLY_ENABLED: ${{ vars.AUTO_APPLY_ENABLED || 'false' }}
+      AUTO_APPLY_ALLOWED_DOMAINS: ${{ vars.AUTO_APPLY_ALLOWED_DOMAINS || 'jobs.lever.co,boards.greenhouse.io,jobs.ashbyhq.com' }}
+      MAX_RESULTS: "20"
+      DAYS_BACK: "3"
+      COUNTRY: "India"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run job search agent
+        run: PYTHONPATH=src python -m job_agent
+
+      - name: Upload spreadsheet artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: job-search-results
+          path: output/*.xlsx
+          if-no-files-found: error
+          retention-days: 30

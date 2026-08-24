@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "linkedin-naukri-job-agent"
+version = "0.1.0"
+description = "Cloud scheduled public job search agent for India roles."
+requires-python = ">=3.11"
+dependencies = [
+  "beautifulsoup4>=4.12.3",
+  "openai>=1.40.0",
+  "openpyxl>=3.1.5",
+  "python-dateutil>=2.9.0",
+  "requests>=2.32.3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3.2"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
