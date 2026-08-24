@@ -9,6 +9,7 @@ from .config import AgentConfig, load_config
 from .extract import extract_job
 from .filtering import filter_jobs
 from .models import JobLead, SearchResult
+from .notifications import maybe_send_results_email
 from .ranker import rank_jobs
 from .resume import resolve_resume
 from .search import build_provider, build_queries
@@ -35,7 +36,9 @@ def run(dry_run: bool = False, config: AgentConfig | None = None) -> Path:
         applicant_profile=config.applicant_profile,
         resume_url=resume_status.reference,
     )
-    return export_jobs_xlsx(top_jobs, config.output_dir, resume_status=resume_status)
+    output_path = export_jobs_xlsx(top_jobs, config.output_dir, resume_status=resume_status)
+    maybe_send_results_email(config, output_path, top_jobs, resume_status)
+    return output_path
 
 
 def collect_jobs(config: AgentConfig) -> list[JobLead]:

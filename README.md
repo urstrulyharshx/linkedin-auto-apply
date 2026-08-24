@@ -16,6 +16,7 @@ Cloud-ready job search automation for India roles. It runs on a schedule, search
 - Flags whether a role is safe/eligible for future allowlisted company-ATS auto-apply.
 - Creates a new spreadsheet file every run under `output/`.
 - GitHub Actions uploads the generated spreadsheet as a downloadable workflow artifact.
+- Optionally emails the spreadsheet as an attachment after each successful run.
 - Defaults to 8 search queries per daily run, roughly 240 SerpAPI searches/month, to fit the free 250/month tier.
 
 ## Cloud Setup
@@ -33,9 +34,19 @@ Cloud-ready job search automation for India roles. It runs on a schedule, search
    - `GOOGLE_API_KEY`
    - `GOOGLE_CSE_ID`
 
-4. The workflow in `.github/workflows/daily-job-search.yml` runs daily at `03:30 UTC`, which is `09:00 AM IST`.
+4. Optional email secrets for daily email delivery:
 
-5. After a run finishes, open the GitHub Actions run and download the `job-search-results` artifact.
+   - `SMTP_HOST`
+   - `SMTP_PORT`
+   - `SMTP_USERNAME`
+   - `SMTP_PASSWORD`
+   - `SMTP_FROM`
+
+   Set repository variable `NOTIFICATION_EMAIL_TO` to `harsh2mishra6@gmail.com`, or leave the workflow default as-is.
+
+5. The workflow in `.github/workflows/daily-job-search.yml` runs daily at `03:30 UTC`, which is `09:00 AM IST`.
+
+6. After a run finishes, open the GitHub Actions run and download the `job-search-results` artifact. If SMTP secrets are configured, the same workbook is emailed to you.
 
 ## Local Test Run
 
@@ -95,6 +106,7 @@ Recommended secrets:
 - `LOCAL_RESUME_PATH`: optional local dry-run path only. GitHub Actions cannot use laptop paths.
 - `APPLICANT_PROFILE_JSON`: your name, email, phone, location, summary, and skills for generating application drafts.
 - `OPENAI_API_KEY`: optional, for stronger AI ranking and tailored draft generation.
+- SMTP secrets: optional, for sending the generated spreadsheet to your email.
 
 Example `APPLICANT_PROFILE_JSON`:
 

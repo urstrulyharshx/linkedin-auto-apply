@@ -24,6 +24,12 @@ jobs:
       RESUME_URL: ${{ secrets.RESUME_URL }}
       AUTO_APPLY_ENABLED: ${{ vars.AUTO_APPLY_ENABLED || 'false' }}
       AUTO_APPLY_ALLOWED_DOMAINS: ${{ vars.AUTO_APPLY_ALLOWED_DOMAINS || 'jobs.lever.co,boards.greenhouse.io,jobs.ashbyhq.com' }}
+      NOTIFICATION_EMAIL_TO: ${{ vars.NOTIFICATION_EMAIL_TO || 'harsh2mishra6@gmail.com' }}
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT || '587' }}
+      SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      SMTP_FROM: ${{ secrets.SMTP_FROM }}
       MAX_RESULTS: "20"
       MAX_SEARCH_QUERIES: "8"
       DAYS_BACK: "3"

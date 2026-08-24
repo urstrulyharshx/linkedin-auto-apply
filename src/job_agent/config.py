@@ -57,6 +57,12 @@ class AgentConfig:
     resume_url: str | None = None
     local_resume_path: Path | None = None
     runtime_dir: Path = Path("runtime")
+    notification_email_to: str | None = None
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_username: str | None = None
+    smtp_password: str | None = None
+    smtp_from: str | None = None
 
 
 def load_config() -> AgentConfig:
@@ -79,6 +85,12 @@ def load_config() -> AgentConfig:
         resume_url=os.getenv("RESUME_URL"),
         local_resume_path=parse_optional_path_env("LOCAL_RESUME_PATH"),
         runtime_dir=Path(os.getenv("RUNTIME_DIR", "runtime")),
+        notification_email_to=os.getenv("NOTIFICATION_EMAIL_TO"),
+        smtp_host=os.getenv("SMTP_HOST"),
+        smtp_port=int(os.getenv("SMTP_PORT", "587")),
+        smtp_username=os.getenv("SMTP_USERNAME"),
+        smtp_password=os.getenv("SMTP_PASSWORD"),
+        smtp_from=os.getenv("SMTP_FROM") or os.getenv("SMTP_USERNAME"),
     )
 
 
