@@ -25,6 +25,7 @@ jobs:
       AUTO_APPLY_ENABLED: ${{ vars.AUTO_APPLY_ENABLED || 'false' }}
       AUTO_APPLY_ALLOWED_DOMAINS: ${{ vars.AUTO_APPLY_ALLOWED_DOMAINS || 'jobs.lever.co,boards.greenhouse.io,jobs.ashbyhq.com' }}
       MAX_RESULTS: "20"
+      MAX_SEARCH_QUERIES: "8"
       DAYS_BACK: "3"
       COUNTRY: "India"
     steps:

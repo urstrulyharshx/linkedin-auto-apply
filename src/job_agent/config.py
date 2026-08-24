@@ -38,6 +38,7 @@ COMPANY_CAREER_TERMS = [
 class AgentConfig:
     search_provider: str = "serpapi"
     max_results: int = 20
+    max_search_queries: int = 8
     days_back: int = 3
     country: str = "India"
     output_dir: Path = Path("output")
@@ -60,6 +61,7 @@ def load_config() -> AgentConfig:
     return AgentConfig(
         search_provider=os.getenv("SEARCH_PROVIDER", "serpapi").strip().lower(),
         max_results=int(os.getenv("MAX_RESULTS", "20")),
+        max_search_queries=int(os.getenv("MAX_SEARCH_QUERIES", "8")),
         days_back=int(os.getenv("DAYS_BACK", "3")),
         country=os.getenv("COUNTRY", "India"),
         output_dir=Path(os.getenv("OUTPUT_DIR", "output")),

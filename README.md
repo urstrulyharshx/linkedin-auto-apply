@@ -16,6 +16,7 @@ Cloud-ready job search automation for India roles. It runs on a schedule, search
 - Flags whether a role is safe/eligible for future allowlisted company-ATS auto-apply.
 - Creates a new spreadsheet file every run under `output/`.
 - GitHub Actions uploads the generated spreadsheet as a downloadable workflow artifact.
+- Defaults to 8 search queries per daily run, roughly 240 SerpAPI searches/month, to fit the free 250/month tier.
 
 ## Cloud Setup
 
@@ -82,3 +83,29 @@ For direct public company career pages or ATS pages: maybe, but only with safegu
 - applicant profile supplied from cloud secrets
 
 This repo currently generates application-ready drafts and eligibility flags. A submitter should be added only for specific ATS providers you explicitly approve.
+
+## Resume and Profile Setup
+
+The cloud workflow cannot read files from your laptop. It only sees values stored in GitHub Secrets or files committed to the repo.
+
+Recommended secrets:
+
+- `SERPAPI_API_KEY`: required for public Google-indexed job search.
+- `RESUME_URL`: a direct downloadable link to your resume PDF, hosted somewhere cloud-accessible.
+- `APPLICANT_PROFILE_JSON`: your name, email, phone, location, summary, and skills for generating application drafts.
+- `OPENAI_API_KEY`: optional, for stronger AI ranking and tailored draft generation.
+
+Example `APPLICANT_PROFILE_JSON`:
+
+```json
+{
+  "name": "Harsh Mishra",
+  "email": "your-email@example.com",
+  "phone": "+91XXXXXXXXXX",
+  "location": "India",
+  "summary": "Python and AI developer focused on backend APIs, ML, and GenAI projects.",
+  "skills": ["Python", "FastAPI", "Machine Learning", "LLMs", "RAG", "SQL"]
+}
+```
+
+For `RESUME_URL`, use a link that GitHub Actions can download without logging in. A private signed URL is better than a public permanent link.

@@ -130,19 +130,29 @@ def build_queries(config: AgentConfig) -> list[str]:
     mode_terms = '(remote OR hybrid OR onsite OR "work from home" OR India)'
     age_terms = '("posted" OR "hiring" OR "apply")'
 
-    queries: list[str] = []
-    for key, site in config.platform_sites.items():
-        queries.append(f"site:{site} {role_group} {junior_terms} {mode_terms} {age_terms}")
-        if key == "naukri":
-            for role in config.roles:
-                queries.extend(
-                    [
-                        f'site:naukri.com "{role}" "0-2 years" India ("posted" OR "apply")',
-                        f'site:naukri.com "{role}" fresher India ("remote" OR hybrid OR onsite)',
-                    ]
-                )
+    priority_platforms = ["naukri", "linkedin", "indeed", "internshala", "wellfound", "glassdoor"]
+    queries: list[str] = [
+        f"site:{config.platform_sites[key]} {role_group} {junior_terms} {mode_terms} {age_terms}"
+        for key in priority_platforms
+        if key in config.platform_sites
+    ]
+
+    naukri_priority_roles = ["AI Engineer", "Gen AI Developer", "Python Backend Developer", "Data Scientist"]
+    for role in naukri_priority_roles:
+        queries.append(f'site:naukri.com "{role}" "0-2 years" India ("posted" OR "apply")')
 
     for career_term in config.company_career_terms:
         queries.append(f"{career_term} {role_group} {junior_terms} {mode_terms} {config.country}")
 
-    return queries
+    return dedupe_preserve_order(queries)[: config.max_search_queries]
+
+
+def dedupe_preserve_order(values: list[str]) -> list[str]:
+    seen: set[str] = set()
+    deduped: list[str] = []
+    for value in values:
+        if value in seen:
+            continue
+        seen.add(value)
+        deduped.append(value)
+    return deduped
