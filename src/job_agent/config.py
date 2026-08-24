@@ -55,6 +55,8 @@ class AgentConfig:
     auto_apply_allowed_domains: list[str] = field(default_factory=list)
     applicant_profile: dict = field(default_factory=dict)
     resume_url: str | None = None
+    local_resume_path: Path | None = None
+    runtime_dir: Path = Path("runtime")
 
 
 def load_config() -> AgentConfig:
@@ -75,6 +77,8 @@ def load_config() -> AgentConfig:
         auto_apply_allowed_domains=parse_csv_env("AUTO_APPLY_ALLOWED_DOMAINS"),
         applicant_profile=parse_json_env("APPLICANT_PROFILE_JSON"),
         resume_url=os.getenv("RESUME_URL"),
+        local_resume_path=parse_optional_path_env("LOCAL_RESUME_PATH"),
+        runtime_dir=Path(os.getenv("RUNTIME_DIR", "runtime")),
     )
 
 
@@ -92,3 +96,8 @@ def parse_json_env(name: str) -> dict:
     except json.JSONDecodeError:
         return {}
     return parsed if isinstance(parsed, dict) else {}
+
+
+def parse_optional_path_env(name: str) -> Path | None:
+    value = os.getenv(name, "").strip()
+    return Path(value).expanduser() if value else None

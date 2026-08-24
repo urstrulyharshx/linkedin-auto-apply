@@ -5,3 +5,6 @@ __pycache__/
 *.pyc
 output/*.xlsx
 output/*.json
+runtime/
+resume/
+*.pdf

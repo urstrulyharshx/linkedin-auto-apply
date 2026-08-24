@@ -10,6 +10,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
 from .models import JobLead
+from .resume import ResumeStatus
 
 
 HEADERS = [
@@ -33,7 +34,7 @@ HEADERS = [
 ]
 
 
-def export_jobs_xlsx(jobs: list[JobLead], output_dir: Path) -> Path:
+def export_jobs_xlsx(jobs: list[JobLead], output_dir: Path, resume_status: ResumeStatus | None = None) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%Y%m%d_%H%M%S_IST")
     output_path = output_dir / f"job_search_top_20_{timestamp}.xlsx"
@@ -67,7 +68,7 @@ def export_jobs_xlsx(jobs: list[JobLead], output_dir: Path) -> Path:
         )
 
     style_sheet(sheet, len(jobs[:20]) + 1)
-    add_metadata_sheet(workbook, jobs)
+    add_metadata_sheet(workbook, jobs, resume_status)
     workbook.save(output_path)
     return output_path
 
@@ -124,7 +125,7 @@ def style_sheet(sheet, last_row: int) -> None:
         sheet.add_table(table)
 
 
-def add_metadata_sheet(workbook: Workbook, jobs: list[JobLead]) -> None:
+def add_metadata_sheet(workbook: Workbook, jobs: list[JobLead], resume_status: ResumeStatus | None = None) -> None:
     sheet = workbook.create_sheet("Run Metadata")
     metadata = [
         ("Generated At IST", datetime.now(ZoneInfo("Asia/Kolkata")).isoformat(timespec="seconds")),
@@ -134,6 +135,14 @@ def add_metadata_sheet(workbook: Workbook, jobs: list[JobLead]) -> None:
         ("Automation Boundary", "Public indexed pages only. No authenticated pages, no auto-apply, no CAPTCHA bypass."),
         ("Auto Apply Policy", "Job-board applications are review-only. Public company/ATS pages are only eligible when explicitly allowlisted."),
     ]
+    if resume_status:
+        metadata.extend(
+            [
+                ("Resume Status", resume_status.status),
+                ("Resume Source", resume_status.source),
+                ("Resume Reference", resume_status.reference),
+            ]
+        )
     for row in metadata:
         sheet.append(row)
     sheet.column_dimensions["A"].width = 28

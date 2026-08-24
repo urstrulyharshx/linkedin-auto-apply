@@ -10,12 +10,14 @@ from .extract import extract_job
 from .filtering import filter_jobs
 from .models import JobLead, SearchResult
 from .ranker import rank_jobs
+from .resume import resolve_resume
 from .search import build_provider, build_queries
 from .spreadsheet import export_jobs_xlsx
 
 
 def run(dry_run: bool = False, config: AgentConfig | None = None) -> Path:
     config = config or load_config()
+    resume_status = resolve_resume(config, allow_local=dry_run)
     raw_jobs = sample_jobs() if dry_run else collect_jobs(config)
     filtered_jobs = filter_jobs(raw_jobs, days_back=config.days_back)
     ranked_jobs = rank_jobs(filtered_jobs, config.openai_api_key, config.openai_model)
@@ -31,9 +33,9 @@ def run(dry_run: bool = False, config: AgentConfig | None = None) -> Path:
         enabled=config.auto_apply_enabled,
         allowed_domains=config.auto_apply_allowed_domains,
         applicant_profile=config.applicant_profile,
-        resume_url=config.resume_url,
+        resume_url=resume_status.reference,
     )
-    return export_jobs_xlsx(top_jobs, config.output_dir)
+    return export_jobs_xlsx(top_jobs, config.output_dir, resume_status=resume_status)
 
 
 def collect_jobs(config: AgentConfig) -> list[JobLead]:

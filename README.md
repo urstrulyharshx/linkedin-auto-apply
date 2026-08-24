@@ -92,6 +92,7 @@ Recommended secrets:
 
 - `SERPAPI_API_KEY`: required for public Google-indexed job search.
 - `RESUME_URL`: a direct downloadable link to your resume PDF, hosted somewhere cloud-accessible.
+- `LOCAL_RESUME_PATH`: optional local dry-run path only. GitHub Actions cannot use laptop paths.
 - `APPLICANT_PROFILE_JSON`: your name, email, phone, location, summary, and skills for generating application drafts.
 - `OPENAI_API_KEY`: optional, for stronger AI ranking and tailored draft generation.
 
@@ -108,4 +109,4 @@ Example `APPLICANT_PROFILE_JSON`:
 }
 ```
 
-For `RESUME_URL`, use a link that GitHub Actions can download without logging in. A private signed URL is better than a public permanent link.
+For `RESUME_URL`, use a link that GitHub Actions can download without logging in. A private signed URL is better than a public permanent link. The workflow downloads the resume during each run, validates that it is a PDF, and records the resume status in the `Run Metadata` sheet. The actual PDF is not committed to git.
